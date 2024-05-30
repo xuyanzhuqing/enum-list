@@ -3,63 +3,43 @@
 ### 用法
 
 ```ts
-import Enum, { EnumFn } from 'enum-list'
+import { Enum } from "enum-list"
 
-export enum IsoState {
-  init = 0x01,
-  check = 0x02,
-  uploading = 0x03,
-  failure = 0x04,
-  finish = 0x05,
-  delete = 0x06,
-  notexist = 0x07,
-  attached = 0x08
+export enum TaskState {
+  TaskStateInit = 0,
+  TaskStateStarted = 1,
+  TaskStatePending = 2,
+  TaskStateDone = 3,
+  TaskStateFailed = 4,
+  TaskStateCanceled = 5,
+  TaskStateTerminated = 6,
+  TaskStatePrepareRetry = 7,
+  TaskStateRetried = 8
 }
 
-export class IsoStateEnum extends Enum {
-  public static states = [
-    { value: IsoState.init /* 也可以自定义 */, label: '初始', desc: 'sss' },
-    { value: IsoState.check, label: '检测中' },
-    { value: IsoState.uploading, label: '上传中' },
-    { value: IsoState.failure, label: '失败' },
-    { value: IsoState.finish, label: '已完成' },
-    { value: IsoState.delete, label: '删除中' },
-    { value: IsoState.notexist, label: '已删除' },
-    { value: IsoState.attached, label: '已挂载' }
-  ] as const // 关键所在
+const taskStates = [
+  { value: TaskState.TaskStateInit, zh_CN: '初始化', en_GB: 'init' },
+  { value: TaskState.TaskStateStarted, zh_CN: '就绪', en_GB: 'started' },
+  { value: TaskState.TaskStatePending, zh_CN: '等待中', en_GB: 'pending' },
+  { value: TaskState.TaskStateDone, zh_CN: '已完成', en_GB: 'done', icon: 'CheckCircleOutlined', color: 'colorSuccess' },
+  { value: TaskState.TaskStateFailed, zh_CN: '失败', en_GB: 'failed', icon: 'CloseCircleOutlined', color: 'colorError' },
+  { value: TaskState.TaskStateCanceled, zh_CN: '已取消', en_GB: 'canceled' },
+  { value: TaskState.TaskStateTerminated, zh_CN: '终止', en_GB: 'terminated' },
+  { value: TaskState.TaskStatePrepareRetry, zh_CN: '准备重试', en_GB: 'retry' },
+  { value: TaskState.TaskStateRetried, zh_CN: '已重试', en_GB: 'retried' },
+] as const // as const 不可省略
 
-  public static value: EnumFn<typeof IsoStateEnum, 'value'>
-  public static label: EnumFn<typeof IsoStateEnum, 'label'>
-}
+export const TaskStateEnum = new Enum<TaskState, typeof taskStates>(taskStates)
 ```
 ---
 ### 测试效果
 ```ts
-console.info(IsoStateEnum.label.上传中.label) // 上传中
-console.info(IsoStateEnum.value[IsoState.attached].label) // 已挂载
-console.info(IsoStateEnum.value[1].label) // 初始
+TaskStateEnum.value.get(TaskState.TaskStateInit)?.label // 初始化 or init（默认中文）
+TaskStateEnum.value.get(TaskState.TaskStateInit)?.value // 0
+TaskStateEnum.toJSON() // 可用于 select options
 ```
 
-### vscode 代码片段
-  > 配置代码片段
-  打开 vscode - 首选项 - 配置用户代码片段 - typescript <br>
-  ```json
-  {
-    "enums": {
-      "prefix": "enums",
-      "body": [
-        "import Enum, { EnumFn } from 'enum-list'",
-        "export class ${TM_FILENAME_BASE}Enum extends Enum {",
-        "  public static states = [",
-        "    { value: '$1', label: ''}",
-        "  ] as const",
-        "",
-        "  public static value: EnumFn<typeof ${TM_FILENAME_BASE}Enum, 'value'>",
-        "  public static label: EnumFn<typeof ${TM_FILENAME_BASE}Enum, 'label'>",
-        "}",
-        ""
-        ]
-    }
-  }
-  ```
-
+### tip
+```
+可通过设置 i18n 中英文切换，自动识别需要显示的中英文
+```

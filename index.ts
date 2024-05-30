@@ -1,27 +1,51 @@
-export interface EnumItem {
-  value: number | string;
-  label: string;
+// https://www.npmjs.com/package/enum-list?activeTab=readme
+
+export interface EnumItem<T> {
+  value: T;
+  zh_CN: string;
+  en_GB: string;
+  label?: string;
   [x: string]: any;
 }
 
-export default abstract class Enum {
-  public static states: readonly EnumItem[]
+export class Enum<T, S extends readonly EnumItem<T>[]> {
+  private states: S
+  constructor(states: S) {
+    this.states = states
+  }
 
-  public static get value (): EnumFn<typeof Enum, 'value'> {
-    const res: any = {}
+  get lng() {
+    return localStorage.getItem('i18nextLng') || 'zh_CN'
+  }
+
+  get value(): Map<T, EnumItem<T>> {
+    const res = new Map<T, EnumItem<T>>()
+    const lng = this.lng
+
     this.states.forEach(v => {
-      res[v.value] = v
+      v.label = v[lng]
+      res.set(v.value, v)
     })
     return res
   }
 
-  public static get label (): EnumFn<typeof Enum, 'label'> {
-    const res: any = {}
-    this.states.forEach(v => {
-      res[v.label] = v
+  toJSON() {
+    const lng = this.lng
+
+    return this.states.map(s => {
+      return {
+        ...s,
+        label: s[lng]
+      }
     })
-    return res
+  }
+
+  toValueEnum() {
+    return this.toJSON().reduce((acc, curr) => {
+      acc[curr.value] = {
+        text: curr.label
+      }
+      return acc
+    }, {} as any)
   }
 }
-
-export type EnumFn<S extends typeof Enum, K extends keyof EnumItem> = Record<S['states'][number][K], EnumItem>;
