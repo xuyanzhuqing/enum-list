@@ -9,7 +9,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "enum",
+    "array",
+    "i18n",
+    "config"
+  ],
   "author": "",
   "license": "ISC",
   "repository": {

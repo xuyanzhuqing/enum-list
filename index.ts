@@ -3,7 +3,7 @@
 export interface EnumItem<T> {
   value: T;
   zh_CN: string;
-  en_GB: string;
+  en_GB?: string;
   label?: string;
   [x: string]: any;
 }
